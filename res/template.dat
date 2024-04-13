@@ -1,0 +1,9 @@
+First Name: $tph$fname$
+Last Name: $tph$lname$
+Address: $tph$addr$
+City: $tph$city$
+State: $tph$state$
+ZIP: $tph$zip$
+Phone: $tph$phone$
+Civil Status: $tph$cstatus$
+Email: $tph$email$
