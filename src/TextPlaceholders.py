@@ -52,8 +52,8 @@ class TextPlaceholders:
                 absolute_idx += relative_idx
                 self.placeholder_position[self.entries] = absolute_idx
                 self.placeholder_names[ph_name] = absolute_idx
-                self.placeholder_indexes[absolute_idx] = ''
                 self.placeholder_lengths[absolute_idx] = LEN_PLACEHOLDER + ph_name_idx + 1
+                self.placeholder_indexes[absolute_idx] = ''
                 absolute_idx += LEN_PLACEHOLDER + ph_name_idx + 1
                 self.entries += 1
         self.inited = True
@@ -61,39 +61,11 @@ class TextPlaceholders:
     def get_placeholder_indexes(self):
         return [i for i in self.placeholder_indexes.keys()]
 
-    def get_surroundings_by_position(self, position : int):
-        if(position < 0):
-            raise TPHError(TPHErrorCodes.NEGATIVE_INDEX, [])
-        if(position not in self.placeholder_position.keys()):
-            raise TPHError(TPHErrorCodes.INVALID_POSITION, [position])
-        index = self.placeholder_position[position]
-        lower_bound = index - 10
-        while(lower_bound < 0):
-            lower_bound += 1
-        upper_bound = index + self.placeholder_lengths[index] + 10
-        while(lower_bound > len(self.text)):
-            lower_bound -= 1
-        print(self.text[lower_bound:upper_bound])
-
-    def get_surroundings_by_index(self, index : int):
-        if(index < 0):
-            raise TPHError(TPHErrorCodes.NEGATIVE_INDEX, [])
-        if(index not in self.placeholder_indexes.keys()):
-            raise TPHError(TPHErrorCodes.INVALID_INDEX, [index])
-        lower_bound = index - 10
-        while(lower_bound < 0):
-            lower_bound += 1
-        upper_bound = index + self.placeholder_lengths[index] + 10
-        while(lower_bound > len(self.text)):
-            lower_bound -= 1
-        print(self.text[lower_bound:upper_bound])
-
-    # TODO: get surroundings by name
-
     def remove_placeholder_by_position(self, position : int):
         index = self.placeholder_position[position]
         del self.placeholder_position[position]
         del self.placeholder_indexes[index]
+        del self.placeholder_lengths[index]
         self.entries -= 1
 
     def remove_placeholder_by_index(self, index):
