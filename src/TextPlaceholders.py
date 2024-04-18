@@ -60,6 +60,19 @@ class TextPlaceholders:
     
     def get_placeholder_indexes(self):
         return [i for i in self.placeholder_indexes.keys()]
+    
+    def display_placeholders(self):
+        indexes = [i for i in self.placeholder_indexes.keys()]
+        names = [i for i in self.placeholder_names.keys()]
+        positions = [i for i in self.placeholder_position.keys()]
+        inv_placeholder_names = {}
+        inv_placeholder_positions = {}
+        for i in range(0, self.entries):
+            inv_placeholder_names[self.placeholder_names[names[i]]] = names[i]
+            inv_placeholder_positions[self.placeholder_position[positions[i]]] = positions[i]
+        print(indexes)
+        print(inv_placeholder_names)
+        print(inv_placeholder_positions)
 
     def remove_placeholder_by_position(self, position : int):
         index = self.placeholder_position[position]
