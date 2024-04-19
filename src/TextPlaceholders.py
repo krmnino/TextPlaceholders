@@ -6,7 +6,8 @@ class TPHErrorCodes(Enum):
     NEGATIVE_INDEX = 1,
     INVALID_POSITION = 2,
     INVALID_INDEX = 3,
-    VALUE_NOT_STRING = 4
+    INVALID_NAME = 4,
+    VALUE_NOT_STRING = 5
 
 class TPHError(Exception):
     def __init__(self, err_code : TPHErrorCodes, opt : list):
@@ -22,7 +23,7 @@ class TPHError(Exception):
         elif(self.error_code == TPHErrorCodes.INVALID_NAME):
             self.message = 'There is not a placeholder with this name value: ' + str(opt[0]) + '.'
         elif(self.error_code == TPHErrorCodes.VALUE_NOT_STRING):
-            self.message = 'The value must be of type string.' + str(opt[0]) + '.'
+            self.message = 'The input value must be of type string.'
         else:
             self.message = 'Undefined error.'
         super().__init__(self.message)
@@ -34,7 +35,7 @@ class TextPlaceholders:
         LEN_PLACEHOLDER = len(PLACEHOLDER)
         self.text = ''
         self.placeholder_names = {}
-        self.placeholder_position = {}
+        self.placeholder_positions = {}
         self.placeholder_indexes = {} 
         self.placeholder_lengths = {} 
         self.entries = 0
@@ -50,13 +51,12 @@ class TextPlaceholders:
                 ph_name_idx = self.text[absolute_idx + relative_idx + LEN_PLACEHOLDER:].find('$')
                 ph_name = self.text[absolute_idx + relative_idx + LEN_PLACEHOLDER:absolute_idx + relative_idx + LEN_PLACEHOLDER + ph_name_idx]
                 absolute_idx += relative_idx
-                self.placeholder_position[self.entries] = absolute_idx
-                self.placeholder_names[ph_name] = absolute_idx
-                self.placeholder_lengths[absolute_idx] = LEN_PLACEHOLDER + ph_name_idx + 1
                 self.placeholder_indexes[absolute_idx] = ''
+                self.placeholder_positions[self.entries] = absolute_idx
+                self.placeholder_names[ph_name] = self.entries
+                self.placeholder_lengths[absolute_idx] = LEN_PLACEHOLDER + ph_name_idx + 1
                 absolute_idx += LEN_PLACEHOLDER + ph_name_idx + 1
                 self.entries += 1
-        self.inited = True
     
     def get_placeholder_indexes(self):
         return [i for i in self.placeholder_indexes.keys()]
@@ -67,31 +67,68 @@ class TextPlaceholders:
         positions = [i for i in self.placeholder_position.keys()]
         inv_placeholder_names = {}
         inv_placeholder_positions = {}
+        indexes_max_len = 0
+        names_max_len = 0
+        positions_max_len = 0
         for i in range(0, self.entries):
             inv_placeholder_names[self.placeholder_names[names[i]]] = names[i]
             inv_placeholder_positions[self.placeholder_position[positions[i]]] = positions[i]
-        print(indexes)
-        print(inv_placeholder_names)
-        print(inv_placeholder_positions)
+            indexes_max_len = max(indexes_max_len, len(str(indexes[i])))
+            names_max_len = max(names_max_len, len(str(names[i])))
+            positions_max_len = max(positions_max_len, len(str(positions[i])))
+        #for i in range(0, self.entries):
+        #    print(f'{positions[i]:10}')
+
+    def remove_placeholder_by_index(self, index : int):
+        if(index not in self.placeholder_indexes):
+            raise TPHError(TPHErrorCodes.INVALID_INDEX, [index])
+        for i in self.placeholder_positions:
+            if(self.placeholder_positions[i] == index):
+                position = i
+                break
+        for i in self.placeholder_names:
+            if(self.placeholder_names[i] == position):
+                name = i
+                break
+        del self.placeholder_indexes[index]
+        del self.placeholder_positions[position]
+        del self.placeholder_names[name]
+        self.entries -= 1
 
     def remove_placeholder_by_position(self, position : int):
-        index = self.placeholder_position[position]
-        del self.placeholder_position[position]
-        del self.placeholder_indexes[index]
-        del self.placeholder_lengths[index]
-        self.entries -= 1
-
-    def remove_placeholder_by_index(self, index):
-        position = 0
-        for i in self.placeholder_indexes.keys():
-            if(index == i):
+        if(position not in self.placeholder_positions):
+            raise TPHError(TPHErrorCodes.INVALID_POSITION, [position])
+        index = self.placeholder_positions[position]
+        for i in self.placeholder_names:
+            if(self.placeholder_names[i] == position):
+                name = i
                 break
-            position += 1
-        del self.placeholder_position[position]
         del self.placeholder_indexes[index]
+        del self.placeholder_positions[position]
+        del self.placeholder_names[name]
         self.entries -= 1
 
-    # TODO: remove placeholder by name
+    def remove_placeholder_by_name(self, name : str):
+        if(name not in self.placeholder_names):
+            raise TPHError(TPHErrorCodes.INVALID_NAME, [name])
+        if(type(name) != str):
+            raise TPHError(TPHErrorCodes.VALUE_NOT_STRING, [])
+        position = self.placeholder_names[name]
+        index = self.placeholder_positions[position]
+        del self.placeholder_indexes[index]
+        del self.placeholder_positions[position]
+        del self.placeholder_names[name]
+        self.entries -= 1
+
+    # Set placeholder value by index
+    def set_ph_value_by_index(self, index : int, value : str):
+        if(index < 0):
+            raise TPHError(TPHErrorCodes.NEGATIVE_INDEX, [])
+        if(index not in self.placeholder_indexes.keys()):
+            raise TPHError(TPHErrorCodes.INVALID_INDEX, [index])
+        if(type(value) != str):
+            raise TPHError(TPHErrorCodes.VALUE_NOT_STRING, [])
+        self.placeholder_indexes[index] = value
 
     # Set placeholder value by position
     def set_ph_value_by_position(self, position : int, value : str):
@@ -102,16 +139,6 @@ class TextPlaceholders:
         if(type(value) != type('')):
             raise TPHError(TPHErrorCodes.VALUE_NOT_STRING, [])
         self.placeholder_indexes[self.placeholder_position[position]] = value
-
-    # Set placeholder value by index
-    def set_ph_value_by_index(self, index : int, value : str):
-        if(index < 0):
-            raise TPHError(TPHErrorCodes.NEGATIVE_INDEX, [])
-        if(index not in self.placeholder_indexes.keys()):
-            raise TPHError(TPHErrorCodes.INVALID_INDEX, [index])
-        if(type(value) != type('')):
-            raise TPHError(TPHErrorCodes.VALUE_NOT_STRING, [])
-        self.placeholder_indexes[index] = value
 
     # Set placeholder value by name
     def set_ph_value_by_name(self, name : int, value : str):
