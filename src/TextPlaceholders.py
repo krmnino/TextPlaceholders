@@ -61,7 +61,7 @@ class TextPlaceholders:
     def get_placeholder_indexes(self):
         return [i for i in self.placeholder_indexes.keys()]
     
-    def display_placeholders(self) -> str:
+    def display_placeholders(self):
         # Define header and for now, maximum text lengths per column
         header = ['NAME', 'POSITION', 'INDEX']
         name_max_len = len(header[0])
@@ -136,7 +136,6 @@ class TextPlaceholders:
         del self.placeholder_names[name]
         self.entries -= 1
 
-    # Set placeholder value by index
     def set_ph_value_by_index(self, index : int, value : str):
         if(index < 0):
             raise TPHError(TPHErrorCodes.NEGATIVE_INDEX, [])
@@ -146,7 +145,6 @@ class TextPlaceholders:
             raise TPHError(TPHErrorCodes.VALUE_NOT_STRING, [])
         self.placeholder_indexes[index] = value
 
-    # Set placeholder value by position
     def set_ph_value_by_position(self, position : int, value : str):
         if(position < 0):
             raise TPHError(TPHErrorCodes.NEGATIVE_INDEX, [])
@@ -156,7 +154,6 @@ class TextPlaceholders:
             raise TPHError(TPHErrorCodes.VALUE_NOT_STRING, [])
         self.placeholder_indexes[self.placeholder_position[position]] = value
 
-    # Set placeholder value by name
     def set_ph_value_by_name(self, name : int, value : str):
         if(name not in self.placeholder_names.keys()):
             raise TPHError(TPHErrorCodes.INVALID_INDEX, [name])
@@ -175,7 +172,6 @@ class TextPlaceholders:
                 out += ''
             else: 
                 out += self.placeholder_indexes[placeholder_idxs[i]]
-            print(self.text[absolute_idx:placeholder_idxs[i]])
             if(absolute_idx == 0):
                 absolute_idx += placeholder_idxs[i] - absolute_idx + self.placeholder_lengths[placeholder_idxs[i]]
                 continue
