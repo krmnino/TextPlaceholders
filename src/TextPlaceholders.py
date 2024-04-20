@@ -177,14 +177,13 @@ class TextPlaceholders:
         index = self.placeholder_positions[position]
         self.placeholder_indexes[index] = value
 
-    def process_text(self):
+    def apply_placeholder_values(self):
         if(self.entries == 0):
             return self.text
         placeholder_idxs = list(self.placeholder_indexes.keys())
-        placeholder_idxs_len = len(placeholder_idxs)
         out = ''
         absolute_idx = 0
-        for i in range(0, placeholder_idxs_len):
+        for i in range(0, self.entries):
             out += self.text[absolute_idx:placeholder_idxs[i]]
             if(self.placeholder_indexes[placeholder_idxs[i]] == ''):
                 out += ''
