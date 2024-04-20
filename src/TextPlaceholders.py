@@ -157,16 +157,19 @@ class TextPlaceholders:
     def set_ph_value_by_position(self, position : int, value : str):
         if(position < 0):
             raise TPHError(TPHErrorCodes.NEGATIVE_INDEX, [])
-        if(position not in self.placeholder_position.keys()):
+        if(position not in self.placeholder_positions.keys()):
             raise TPHError(TPHErrorCodes.INVALID_POSITION, [position])
         if(type(value) != type('')):
             raise TPHError(TPHErrorCodes.VALUE_NOT_STRING, [])
-        self.placeholder_indexes[self.placeholder_position[position]] = value
+        index = self.placeholder_positions[position]
+        self.placeholder_indexes[index] = value
 
     def set_ph_value_by_name(self, name : int, value : str):
         if(name not in self.placeholder_names.keys()):
             raise TPHError(TPHErrorCodes.INVALID_INDEX, [name])
-        self.placeholder_indexes[self.placeholder_names[name]] = value
+        position = self.placeholder_names[name]
+        index = self.placeholder_positions[position]
+        self.placeholder_indexes[index] = value
 
     def process_text(self):
         if(self.entries == 0):
