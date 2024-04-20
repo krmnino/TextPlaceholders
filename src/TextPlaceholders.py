@@ -61,6 +61,12 @@ class TextPlaceholders:
     def get_placeholder_indexes(self):
         return [i for i in self.placeholder_indexes.keys()]
     
+    def get_placeholder_positions(self):
+        return [i for i in self.placeholder_positions.keys()]
+    
+    def get_placeholder_names(self):
+        return [i for i in self.placeholder_names.keys()]
+    
     def display_placeholders(self):
         # Define header and for now, maximum text lengths per column
         header = ['NAME', 'POSITION', 'INDEX', 'VALUE']
