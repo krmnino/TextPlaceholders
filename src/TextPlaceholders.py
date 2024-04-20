@@ -63,17 +63,20 @@ class TextPlaceholders:
     
     def display_placeholders(self):
         # Define header and for now, maximum text lengths per column
-        header = ['NAME', 'POSITION', 'INDEX']
+        header = ['NAME', 'POSITION', 'INDEX', 'VALUE']
         name_max_len = len(header[0])
         position_max_len = len(header[1])
         index_max_len = len(header[2])
+        value_max_len = len(header[3])
         # Find the element with maximum length in a column
         for name in self.placeholder_names:
             position = self.placeholder_names[name]
             index = self.placeholder_positions[position]
+            value = self.placeholder_indexes[index]
             name_max_len = max(name_max_len, len(name))
             position_max_len = max(position_max_len, len(str(position)))
             index_max_len = max(index_max_len, len(str(index)))
+            value_max_len = max(value_max_len, len(value))
         # Prepare header print
         if(name_max_len > len(header[0])):
             header[0] += ''.join(['.' for i in range(0, name_max_len - len(header[0]))])
@@ -81,10 +84,14 @@ class TextPlaceholders:
             header[1] += ''.join(['.' for i in range(0, position_max_len - len(header[1]))])
         if(index_max_len > len(header[2])):
             header[2] += ''.join(['.' for i in range(0, index_max_len - len(header[2]))])
-        print(header[0], header[1], header[2])
+        if(value_max_len > len(header[3])):
+            header[3] += ''.join(['.' for i in range(0, value_max_len - len(header[3]))])
+        print(header[0], header[1], header[2], header[3])
         # Prepate table entries print
         for name in self.placeholder_names:
             position = self.placeholder_names[name]
+            index = self.placeholder_positions[position]
+            value = self.placeholder_indexes[index]
             index = str(self.placeholder_positions[position])
             if(index_max_len > len(index)):
                 index = ''.join(['.' for i in range(0, index_max_len - len(index))]) + index
@@ -93,7 +100,9 @@ class TextPlaceholders:
                 position = ''.join(['.' for i in range(0, position_max_len - len(position))]) + position
             if(name_max_len > len(name)):
                 name += ''.join(['.' for i in range(0, name_max_len - len(name))])
-            print(name, position, index)
+            if(value_max_len > len(value)):
+                value += ''.join(['.' for i in range(0, value_max_len - len(value))])
+            print(name, position, index, value)
 
     def remove_placeholder_by_index(self, index : int):
         if(index not in self.placeholder_indexes):
