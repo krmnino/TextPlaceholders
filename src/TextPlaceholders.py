@@ -1,5 +1,4 @@
 from enum import Enum
-import sys
 
 class TPHErrorCodes(Enum):
     OK = 0,
