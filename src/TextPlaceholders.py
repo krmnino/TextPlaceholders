@@ -8,6 +8,7 @@ class TPHErrorCodes(Enum):
     INVALID_NAME = 4,
     VALUE_NOT_STRING = 5
 
+
 class TPHError(Exception):
     def __init__(self, err_code : TPHErrorCodes, opt : list):
         self.error_code = err_code
